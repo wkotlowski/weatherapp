@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -12,7 +13,6 @@ var city string
 func main() {
 	fmt.Println("Welcome to my simple weather application.")
 	checkCity()
-	fmt.Println("Weather for", city, "is:")
 	checkWeather()
 }
 
@@ -31,11 +31,16 @@ func checkWeather() {
 
 	defer resp.Body.Close()
 
-	body, error := ioutil.ReadAll(resp.Body)
+	byteValue, error := ioutil.ReadAll(resp.Body)
 	if error != nil {
 		log.Fatalln(err)
 	}
 
-	stringBody := string(body)
-	fmt.Println(stringBody)
+	var weather Response
+
+	json.Unmarshal(byteValue, &weather)
+	fmt.Println("Current weather is:")
+	fmt.Println("Temperature in Celcius:", weather.Current.TempC)
+	fmt.Println("Temperature in Fahrenheit:", weather.Current.TempF)
+	fmt.Println("Condition:", weather.Current.Condition.Text)
 }
